@@ -6,11 +6,12 @@ import (
 	"time"
 )
 
-func TestCreateTask(t *testing.T) {
+func TestCreateCompleteTask(t *testing.T) {
 	ctx := context.Background()
 	task, err := Create(ctx, &CreateParams{
 		Name: t.Name(),
 	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -22,7 +23,7 @@ func TestCreateTask(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	lead, err := Lead(ctx, &LeadParams{})
+	lead, err := Average(ctx, &AverageParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
