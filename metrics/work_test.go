@@ -6,6 +6,9 @@ import (
 	"encoding/json"
 	"testing"
 	"time"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 //go:embed testdata/first_commit_new_branch.json
@@ -14,77 +17,58 @@ var newBrachJSON []byte
 //go:embed testdata/pr_opened.json
 var newPRJSON []byte
 
-func getPush(t *testing.T, bytes []byte) Push {
-	var push Push
+var _ = Describe("Mortems", func() {
+	var ctx context.Context
+	BeforeEach(func() {
+		ctx = context.Background()
+	})
 
-	err := json.Unmarshal(bytes, &push)
-	if err != nil {
-		t.Fatal(err)
-	}
+	Context("a commit has been pushed to a branch", func() {
+		var push Push
+		var pushResp *WorkID
+		BeforeEach(func() {
+			err := json.Unmarshal(newBrachJSON, &push)
+			Expect(err).NotTo(HaveOccurred())
 
-	return push
-}
+			pushResp, err = GitPush(ctx, &push)
+			Expect(err).NotTo(HaveOccurred())
+		})
 
-func getPR(t *testing.T, bytes []byte) PullRequest {
-	var pr PullRequest
+		It("saves branch name and time", func() {
+			work, err := Get(ctx, &WorkID{pushResp.ID})
+			Expect(err).NotTo(HaveOccurred())
 
-	err := json.Unmarshal(bytes, &pr)
-	if err != nil {
-		t.Fatal(err)
-	}
+			shouldStart, err := time.Parse(time.RFC3339, "2021-05-13T09:09:18+02:00")
+			Expect(err).NotTo(HaveOccurred())
 
-	return pr
-}
+			Expect(work.Start).To(Equal(shouldStart))
+			Expect(work.Branch).To(Equal("lead-test"))
+		})
 
-func TestCreateBranch(t *testing.T) {
-	ctx := context.Background()
-	push := getPush(t, newBrachJSON)
+		Context("a pull request has been created", func() {
+			var pr PullRequest
+			var prResp *WorkID
+			BeforeEach(func() {
+				ctx := context.Background()
 
-	pushResp, err := GitPush(ctx, &push)
-	if err != nil {
-		t.Fatal(err)
-	}
+				err := json.Unmarshal(newPRJSON, &pr)
+				Expect(err).NotTo(HaveOccurred())
 
-	work, err := Get(ctx, &WorkID{pushResp.ID})
-	if err != nil {
-		t.Fatal(err)
-	}
+				prResp, err = GitPullRequest(ctx, &pr)
+				Expect(err).NotTo(HaveOccurred())
+			})
 
-	shouldStart, err := time.Parse(time.RFC3339, "2021-05-13T09:09:18+02:00")
-	if err != nil {
-		t.Fatal(err)
-	}
+			It("associates the pull request with the correct work", func() {
+				work, err := Get(ctx, &WorkID{prResp.ID})
+				Expect(err).NotTo(HaveOccurred())
 
-	if work.Start != shouldStart {
-		t.Fatalf("work started at the wrong time, %v, %v", work.Start, shouldStart)
-	}
+				Expect(work.PullRequest).To(Equal(1))
+			})
+		})
+	})
+})
 
-	if work.Branch != "lead-test" {
-		t.Fatalf("work had the wrong branch name: %s", work.Branch)
-	}
-}
-
-func TestCreateBranchPR(t *testing.T) {
-	ctx := context.Background()
-	push := getPush(t, newBrachJSON)
-	pr := getPR(t, newPRJSON)
-
-	_, err := GitPush(ctx, &push)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	prResp, err := GitPullRequest(ctx, &pr)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	work, err := Get(ctx, &WorkID{prResp.ID})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if work.PullRequest != 1 {
-		t.Fatal("work item did not get associated with the correct pull request")
-	}
+func TestWork(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Work Suite")
 }
