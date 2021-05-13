@@ -1,0 +1,121 @@
+{
+  "action": "closed",
+  "number": 1,
+  "pull_request": {
+    "id": 643760736,
+    "node_id": "MDExOlB1bGxSZXF1ZXN0NjQzNzYwNzM2",
+    "number": 1,
+    "state": "closed",
+    "locked": false,
+    "title": "Added a 4th mortem at 9:09",
+    "user": {
+      "login": "ostenbom",
+      "id": 7828615,
+      "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+    },
+    "body": "",
+    "created_at": "2021-05-13T07:09:44Z",
+    "updated_at": "2021-05-13T07:26:13Z",
+    "closed_at": "2021-05-13T07:26:12Z",
+    "merged_at": "2021-05-13T07:26:12Z",
+    "merge_commit_sha": "9bd73f28b5ed4597123de1d8ecf509078d99bc84",
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "requested_reviewers": [
+
+    ],
+    "requested_teams": [
+
+    ],
+    "labels": [
+
+    ],
+    "milestone": null,
+    "draft": false,
+    "head": {
+      "label": "ostenbom:lead-test",
+      "ref": "lead-test",
+      "sha": "44843ede8c8b7aefef69347327f6243ef42f0cf6",
+      "user": {
+        "login": "ostenbom",
+        "id": 7828615,
+        "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+      },
+      "repo": {
+        "id": 297037088,
+        "node_id": "MDEwOlJlcG9zaXRvcnkyOTcwMzcwODg=",
+        "name": "test-mortems",
+        "full_name": "ostenbom/test-mortems",
+        "private": true,
+        "owner": {
+          "login": "ostenbom",
+          "id": 7828615,
+          "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+        },
+        "default_branch": "master"
+      }
+    },
+    "base": {
+      "label": "ostenbom:master",
+      "ref": "master",
+      "sha": "0be0ce13c1309f47177c81aaf87f4a71e8aacfe0",
+      "user": {
+        "login": "ostenbom",
+        "id": 7828615,
+        "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+      },
+      "repo": {
+        "id": 297037088,
+        "node_id": "MDEwOlJlcG9zaXRvcnkyOTcwMzcwODg=",
+        "name": "test-mortems",
+        "full_name": "ostenbom/test-mortems",
+        "private": true,
+        "owner": {
+          "login": "ostenbom",
+          "id": 7828615,
+          "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+        },
+        "default_branch": "master"
+      }
+    },
+    "author_association": "OWNER",
+    "auto_merge": null,
+    "active_lock_reason": null,
+    "merged": true,
+    "mergeable": null,
+    "rebaseable": null,
+    "mergeable_state": "unknown",
+    "merged_by": {
+      "login": "ostenbom",
+      "id": 7828615,
+      "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+    },
+    "comments": 0,
+    "review_comments": 0,
+    "maintainer_can_modify": false,
+    "commits": 2,
+    "additions": 96,
+    "deletions": 0,
+    "changed_files": 2
+  },
+  "repository": {
+    "id": 297037088,
+    "node_id": "MDEwOlJlcG9zaXRvcnkyOTcwMzcwODg=",
+    "name": "test-mortems",
+    "full_name": "ostenbom/test-mortems",
+    "private": true,
+    "owner": {
+      "login": "ostenbom",
+      "id": 7828615,
+      "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+    },
+    "default_branch": "master"
+  },
+  "sender": {
+    "login": "ostenbom",
+    "id": 7828615,
+    "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+  }
+}

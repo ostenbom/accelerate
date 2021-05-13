@@ -1,0 +1,136 @@
+{
+  "action": "closed",
+  "number": 1,
+  "pull_request": {
+    "url": "https://api.github.com/repos/ostenbom/test-mortems/pulls/2",
+    "id": 643779004,
+    "node_id": "MDExOlB1bGxSZXF1ZXN0NjQzNzc5MDA0",
+    "number": 2,
+    "state": "closed",
+    "locked": false,
+    "title": "Lead test",
+    "user": {
+      "login": "ostenbom",
+      "id": 7828615,
+      "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+    },
+    "body": "",
+    "created_at": "2021-05-13T07:41:00Z",
+    "updated_at": "2021-05-13T07:41:12Z",
+    "closed_at": "2021-05-13T07:41:12Z",
+    "merged_at": "2021-05-13T07:41:12Z",
+    "merge_commit_sha": "ecc81403853a621bea766bad50d1fb907d1b2689",
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "requested_reviewers": [
+
+    ],
+    "requested_teams": [
+
+    ],
+    "labels": [
+
+    ],
+    "milestone": null,
+    "draft": false,
+    "head": {
+      "label": "ostenbom:lead-test",
+      "ref": "lead-test",
+      "sha": "44843ede8c8b7aefef69347327f6243ef42f0cf6",
+      "user": {
+        "login": "ostenbom",
+        "id": 7828615,
+        "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+      },
+      "repo": {
+        "id": 297037088,
+        "node_id": "MDEwOlJlcG9zaXRvcnkyOTcwMzcwODg=",
+        "name": "test-mortems",
+        "full_name": "ostenbom/test-mortems",
+        "private": true,
+        "owner": {
+          "login": "ostenbom",
+          "id": 7828615,
+          "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+        },
+        "created_at": "2020-09-20T08:53:06Z",
+        "updated_at": "2021-05-13T07:40:30Z",
+        "pushed_at": "2021-05-13T07:41:12Z",
+        "default_branch": "master",
+        "allow_squash_merge": true,
+        "allow_merge_commit": true,
+        "allow_rebase_merge": true,
+        "delete_branch_on_merge": false
+      }
+    },
+    "base": {
+      "label": "ostenbom:master",
+      "ref": "master",
+      "sha": "0be0ce13c1309f47177c81aaf87f4a71e8aacfe0",
+      "user": {
+        "login": "ostenbom",
+        "id": 7828615,
+        "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+      },
+      "repo": {
+        "id": 297037088,
+        "node_id": "MDEwOlJlcG9zaXRvcnkyOTcwMzcwODg=",
+        "name": "test-mortems",
+        "full_name": "ostenbom/test-mortems",
+        "private": true,
+        "owner": {
+          "login": "ostenbom",
+          "id": 7828615,
+          "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+        },
+        "default_branch": "master",
+        "allow_squash_merge": true,
+        "allow_merge_commit": true,
+        "allow_rebase_merge": true,
+        "delete_branch_on_merge": false
+      }
+    },
+    "author_association": "OWNER",
+    "auto_merge": null,
+    "active_lock_reason": null,
+    "merged": true,
+    "mergeable": null,
+    "rebaseable": null,
+    "mergeable_state": "unknown",
+    "merged_by": {
+      "login": "ostenbom",
+      "id": 7828615,
+      "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+    },
+    "comments": 0,
+    "review_comments": 0,
+    "maintainer_can_modify": false,
+    "commits": 2,
+    "additions": 96,
+    "deletions": 0,
+    "changed_files": 2
+  },
+  "repository": {
+    "id": 297037088,
+    "node_id": "MDEwOlJlcG9zaXRvcnkyOTcwMzcwODg=",
+    "name": "test-mortems",
+    "full_name": "ostenbom/test-mortems",
+    "private": true,
+    "owner": {
+      "login": "ostenbom",
+      "id": 7828615,
+      "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+    },
+    "created_at": "2020-09-20T08:53:06Z",
+    "updated_at": "2021-05-13T07:40:30Z",
+    "pushed_at": "2021-05-13T07:41:12Z",
+    "default_branch": "master"
+  },
+  "sender": {
+    "login": "ostenbom",
+    "id": 7828615,
+    "node_id": "MDQ6VXNlcjc4Mjg2MTU="
+  }
+}
