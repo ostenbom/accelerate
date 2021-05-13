@@ -3,6 +3,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"encore.dev/storage/sqldb"
@@ -26,8 +27,22 @@ type Work struct {
 }
 
 type Push struct {
-	// Name is the name of the task.
-	Ref string `json:"ref"`
+	Ref     string   `json:"ref"`
+	Commits []Commit `json:"commits"`
+}
+
+type Commit struct {
+	Time time.Time `json:"timestamp"`
+}
+
+type PullRequest struct {
+	Action string `json:"action"`
+	Number int    `json:"number"`
+	PR     struct {
+		Head struct {
+			Ref string `json:"ref"`
+		} `json:"head"`
+	} `json:"pull_request"`
 }
 
 type WorkID struct {
@@ -37,18 +52,58 @@ type WorkID struct {
 // GitPush Accepts Github Webhooks of the "push" type
 // encore:api public
 func GitPush(ctx context.Context, push *Push) (*WorkID, error) {
-	w := &Work{Branch: push.Ref, Start: time.Now()}
+	earliestTime := time.Now().Add(time.Hour)
 
+	for _, commit := range push.Commits {
+		if commit.Time.Before(earliestTime) {
+			earliestTime = commit.Time
+		}
+	}
+
+	branchName := strings.TrimPrefix(push.Ref, "refs/heads/")
+
+	w := &Work{Branch: branchName, Start: earliestTime}
+
+	defaultTime := time.Unix(0, 0)
 	err := sqldb.QueryRow(ctx, `
-		INSERT INTO work (branch, start_time)
-		VALUES ($1, $2)
+		INSERT INTO work (branch, start_time, merged_time, deployed_time)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id;
-	`, &w.Branch, &w.Start).Scan(&w.ID)
+	`, &w.Branch, &w.Start, &defaultTime, &defaultTime).Scan(&w.ID)
 	if err != nil {
 		return nil, fmt.Errorf("could not create work: %w", err)
 	}
 
 	return &WorkID{w.ID}, nil
+}
+
+// GitPullRequest Accepts Github Webhooks of the "pull_request" type
+// encore:api public
+func GitPullRequest(ctx context.Context, pr *PullRequest) (*WorkID, error) {
+	w := &WorkID{}
+
+	err := sqldb.QueryRow(ctx, `
+		SELECT
+			id
+		FROM work
+		WHERE branch = $1
+		LIMIT 1;
+	`, &pr.PR.Head.Ref).Scan(&w.ID)
+	if err != nil {
+		return nil, fmt.Errorf("could not get work: %w", err)
+	}
+
+	err = sqldb.QueryRow(ctx, `
+		UPDATE work
+		SET pull_request = $1
+		WHERE id = $2
+		RETURNING id;
+	`, &pr.Number, &w.ID).Scan(&w.ID)
+	if err != nil {
+		return nil, fmt.Errorf("could not update work with pull request: %w", err)
+	}
+
+	return w, nil
 }
 
 // Get retreives a work item with a specific ID
@@ -59,11 +114,11 @@ func Get(ctx context.Context, params *WorkID) (*Work, error) {
 	// id, branch, pull_request, merge_commit, start_time, merged_time, deployed_time
 	err := sqldb.QueryRow(ctx, `
 		SELECT
-			id, branch
+			id, branch, pull_request, start_time
 		FROM work
 		WHERE id = $1
 		LIMIT 1;
-	`, params.ID).Scan(&w.ID, &w.Branch)
+	`, params.ID).Scan(&w.ID, &w.Branch, &w.PullRequest, &w.Start)
 	// `, params.ID).Scan(&w.ID, &w.Branch, &w.PullRequest, &w.MergeCommit, &w.Start, &w.Merged, &w.Deployed)
 	if err != nil {
 		return nil, fmt.Errorf("could not get work: %w", err)
