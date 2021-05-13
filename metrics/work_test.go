@@ -44,7 +44,7 @@ var _ = Describe("GitHub Work Flow", func() {
 			shouldStart, err := time.Parse(time.RFC3339, "2021-05-13T09:09:18+02:00")
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(work.Start).To(Equal(shouldStart))
+			Expect(work.Start.Unix()).To(Equal(shouldStart.Unix()))
 			Expect(work.Branch).To(Equal("lead-test"))
 		})
 
@@ -87,9 +87,9 @@ var _ = Describe("GitHub Work Flow", func() {
 
 					Expect(work.MergeCommit).To(Equal("9bd73f28b5ed4597123de1d8ecf509078d99bc84"))
 
-					expectedMergeTime, err := time.Parse(time.RFC3339, "2021-05-13T09:26:12+02:00")
+					expectedMergeTime, err := time.Parse(time.RFC3339, "2021-05-13T07:26:12Z")
 					Expect(err).NotTo(HaveOccurred())
-					Expect(work.Merged).To(Equal(expectedMergeTime))
+					Expect(work.Merged.Unix()).To(Equal(expectedMergeTime.Unix()))
 				})
 			})
 		})
