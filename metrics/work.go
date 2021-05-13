@@ -42,6 +42,8 @@ type PullRequest struct {
 		Head struct {
 			Ref string `json:"ref"`
 		} `json:"head"`
+		MergedTime time.Time `json:"merged_at"`
+		MergeSha   string    `json:"merge_commit_sha"`
 	} `json:"pull_request"`
 }
 
@@ -93,17 +95,47 @@ func GitPullRequest(ctx context.Context, pr *PullRequest) (*WorkID, error) {
 		return nil, fmt.Errorf("could not get work: %w", err)
 	}
 
-	err = sqldb.QueryRow(ctx, `
+	if pr.Action == "opened" {
+		err := associatePR(ctx, pr, w)
+		if err != nil {
+			return nil, err
+		}
+	} else if pr.Action == "closed" {
+		err := associateMerge(ctx, pr, w)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return w, nil
+}
+
+func associatePR(ctx context.Context, pr *PullRequest, w *WorkID) error {
+	err := sqldb.QueryRow(ctx, `
 		UPDATE work
 		SET pull_request = $1
 		WHERE id = $2
 		RETURNING id;
 	`, &pr.Number, &w.ID).Scan(&w.ID)
 	if err != nil {
-		return nil, fmt.Errorf("could not update work with pull request: %w", err)
+		return fmt.Errorf("could not update work with pull request: %w", err)
 	}
 
-	return w, nil
+	return nil
+}
+
+func associateMerge(ctx context.Context, pr *PullRequest, w *WorkID) error {
+	err := sqldb.QueryRow(ctx, `
+		UPDATE work
+		SET merge_commit = $1, merged_time = $2
+		WHERE id = $3
+		RETURNING id;
+	`, &pr.PR.MergeSha, &pr.PR.MergedTime, &w.ID).Scan(&w.ID)
+	if err != nil {
+		return fmt.Errorf("could not update work with merge: %w", err)
+	}
+
+	return nil
 }
 
 // Get retreives a work item with a specific ID
@@ -111,15 +143,13 @@ func GitPullRequest(ctx context.Context, pr *PullRequest) (*WorkID, error) {
 func Get(ctx context.Context, params *WorkID) (*Work, error) {
 	w := &Work{}
 
-	// id, branch, pull_request, merge_commit, start_time, merged_time, deployed_time
 	err := sqldb.QueryRow(ctx, `
 		SELECT
-			id, branch, pull_request, start_time
+			id, branch, pull_request, merge_commit, start_time, merged_time, deployed_time
 		FROM work
 		WHERE id = $1
 		LIMIT 1;
-	`, params.ID).Scan(&w.ID, &w.Branch, &w.PullRequest, &w.Start)
-	// `, params.ID).Scan(&w.ID, &w.Branch, &w.PullRequest, &w.MergeCommit, &w.Start, &w.Merged, &w.Deployed)
+	`, params.ID).Scan(&w.ID, &w.Branch, &w.PullRequest, &w.MergeCommit, &w.Start, &w.Merged, &w.Deployed)
 	if err != nil {
 		return nil, fmt.Errorf("could not get work: %w", err)
 	}

@@ -17,7 +17,10 @@ var newBrachJSON []byte
 //go:embed testdata/pr_opened.json
 var newPRJSON []byte
 
-var _ = Describe("Mortems", func() {
+//go:embed testdata/pr_closed_rebase.json
+var closedPRRebaseJSON []byte
+
+var _ = Describe("GitHub Work Flow", func() {
 	var ctx context.Context
 	BeforeEach(func() {
 		ctx = context.Background()
@@ -63,6 +66,31 @@ var _ = Describe("Mortems", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(work.PullRequest).To(Equal(1))
+			})
+
+			Context("the pull request is closed", func() {
+				var closePR PullRequest
+				var closePRResp *WorkID
+				BeforeEach(func() {
+					ctx := context.Background()
+
+					err := json.Unmarshal(closedPRRebaseJSON, &closePR)
+					Expect(err).NotTo(HaveOccurred())
+
+					closePRResp, err = GitPullRequest(ctx, &closePR)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("associates the merge commit and time", func() {
+					work, err := Get(ctx, &WorkID{closePRResp.ID})
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(work.MergeCommit).To(Equal("9bd73f28b5ed4597123de1d8ecf509078d99bc84"))
+
+					expectedMergeTime, err := time.Parse(time.RFC3339, "2021-05-13T09:26:12+02:00")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(work.Merged).To(Equal(expectedMergeTime))
+				})
 			})
 		})
 	})
