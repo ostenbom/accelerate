@@ -20,6 +20,9 @@ var newPRJSON []byte
 //go:embed testdata/pr_closed_rebase.json
 var closedPRRebaseJSON []byte
 
+//go:embed testdata/pr_closed_merged.json
+var closedPRMergeJSON []byte
+
 var _ = Describe("GitHub Work Flow", func() {
 	var ctx context.Context
 	BeforeEach(func() {
@@ -68,7 +71,7 @@ var _ = Describe("GitHub Work Flow", func() {
 				Expect(work.PullRequest).To(Equal(1))
 			})
 
-			Context("the pull request is closed", func() {
+			Context("the pull request is closed with a rebase", func() {
 				var closePR PullRequest
 				var closePRResp *WorkID
 				BeforeEach(func() {
@@ -88,6 +91,31 @@ var _ = Describe("GitHub Work Flow", func() {
 					Expect(work.MergeCommit).To(Equal("9bd73f28b5ed4597123de1d8ecf509078d99bc84"))
 
 					expectedMergeTime, err := time.Parse(time.RFC3339, "2021-05-13T07:26:12Z")
+					Expect(err).NotTo(HaveOccurred())
+					Expect(work.Merged.Unix()).To(Equal(expectedMergeTime.Unix()))
+				})
+			})
+
+			Context("the pull request is closed with a merge commit", func() {
+				var closePR PullRequest
+				var closePRResp *WorkID
+				BeforeEach(func() {
+					ctx := context.Background()
+
+					err := json.Unmarshal(closedPRMergeJSON, &closePR)
+					Expect(err).NotTo(HaveOccurred())
+
+					closePRResp, err = GitPullRequest(ctx, &closePR)
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("associates the merge commit and time", func() {
+					work, err := Get(ctx, &WorkID{closePRResp.ID})
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(work.MergeCommit).To(Equal("ecc81403853a621bea766bad50d1fb907d1b2689"))
+
+					expectedMergeTime, err := time.Parse(time.RFC3339, "2021-05-13T07:41:12Z")
 					Expect(err).NotTo(HaveOccurred())
 					Expect(work.Merged.Unix()).To(Equal(expectedMergeTime.Unix()))
 				})
