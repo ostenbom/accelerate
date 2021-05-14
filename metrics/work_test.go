@@ -94,6 +94,16 @@ var _ = Describe("GitHub Work Flow", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(work.Merged.Unix()).To(Equal(expectedMergeTime.Unix()))
 				})
+
+				It("can associate the correct deployment time", func() {
+					deployTime := time.Now()
+					_, err := SetDeployed(ctx, &DeployedParams{"9bd73f28b5ed4597123de1d8ecf509078d99bc84", deployTime})
+
+					work, err := Get(ctx, &WorkID{closePRResp.ID})
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(work.Deployed.Unix()).To(Equal(deployTime.Unix()))
+				})
 			})
 
 			Context("the pull request is closed with a merge commit", func() {

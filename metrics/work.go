@@ -138,6 +138,30 @@ func associateMerge(ctx context.Context, pr *PullRequest, w *WorkID) error {
 	return nil
 }
 
+type DeployedParams struct {
+	// The main branch commit with an associated peice of work
+	Commit string
+	// The time at which the deployment was completed
+	Time time.Time
+}
+
+// Deployed associates a peice of work with a deployment timestamp
+// encore:api public
+func SetDeployed(ctx context.Context, params *DeployedParams) (*WorkID, error) {
+	w := &WorkID{}
+
+	err := sqldb.QueryRow(ctx, `
+		UPDATE work
+		SET deployed_time = $1
+		WHERE merge_commit = $2
+		RETURNING id;
+	`, &params.Time, &params.Commit).Scan(&w.ID)
+	if err != nil {
+		return nil, fmt.Errorf("could not update work with deployment time: %w", err)
+	}
+	return w, nil
+}
+
 // Get retreives a work item with a specific ID
 // encore:api public
 func Get(ctx context.Context, params *WorkID) (*Work, error) {
